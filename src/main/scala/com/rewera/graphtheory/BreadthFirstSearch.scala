@@ -21,7 +21,7 @@ object BreadthFirstSearch {
     10 -> Seq(8),
     11 -> Seq(5, 6),
     12 -> Seq(0, 8)
-  ).mapValues(_.sorted)
+  ).view.mapValues(_.sorted).toMap
 
   def main(args: Array[String]): Unit = {
     breadthFirstSearch(theGraph, 0)
