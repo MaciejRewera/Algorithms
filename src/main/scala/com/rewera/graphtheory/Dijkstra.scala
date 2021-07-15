@@ -4,9 +4,7 @@ import scala.collection.mutable
 
 object Dijkstra {
 
-  private case class Edge(targetNode: Int, weight: Int) {
-    def copyWithChangedWeightSign: Edge = this.copy(weight = this.weight * -1)
-  }
+  private case class Edge(targetNode: Int, weight: Int)
 
   private type WeightedGraph = Map[Int, Seq[Edge]]
 
