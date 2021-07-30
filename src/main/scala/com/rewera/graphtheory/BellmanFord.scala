@@ -3,12 +3,12 @@ package com.rewera.graphtheory
 object BellmanFord {
 
   private case class Edge(fromNode: Int, toNode: Int, weight: Int)
-  private type WeightedGraphEdges = Seq[Edge]
+  private type WeightedGraphEdgeList = Seq[Edge]
 
   private case class HalfEdge(toNode: Int, weight: Int)
-  private type WeightedGraph = Map[Int, Seq[HalfEdge]]
+  private type WeightedGraphAdjacencyList[T] = Map[Int, Seq[T]]
 
-  private val theGraphEdges: WeightedGraphEdges = Seq(
+  private val theGraphEdges: WeightedGraphEdgeList = Seq(
     Edge(0, 1, 5),
     Edge(1, 2, 20),
     Edge(1, 5, 30),
@@ -24,7 +24,7 @@ object BellmanFord {
     Edge(7, 8, -10)
   )
 
-  private val theGraph: WeightedGraph = Map(
+  private val theGraph: WeightedGraphAdjacencyList[HalfEdge] = Map(
     0 -> Seq(HalfEdge(1, 5)),
     1 -> Seq(HalfEdge(2, 20), HalfEdge(5, 30), HalfEdge(6, 60)),
     2 -> Seq(HalfEdge(3, 10), HalfEdge(4, 75)),
@@ -41,7 +41,7 @@ object BellmanFord {
     println(runBellmanFord(theGraph, 0).mkString("[", ", ", "]"))
   }
 
-  def runBellmanFord(graph: WeightedGraphEdges, startNode: Int): Seq[Double] = {
+  def runBellmanFord(graph: WeightedGraphEdgeList, startNode: Int): Seq[Double] = {
     val verticesAmount = vertices(graph).size
     val distances = Array.fill(verticesAmount)(Double.PositiveInfinity)
     distances(startNode) = 0
@@ -65,12 +65,12 @@ object BellmanFord {
     distances
   }
 
-  private def vertices(graph: WeightedGraphEdges): Set[Int] = graph.map(_.fromNode).toSet ++ graph.map(_.toNode).toSet
+  private def vertices(graph: WeightedGraphEdgeList): Set[Int] = graph.map(_.fromNode).toSet ++ graph.map(_.toNode).toSet
 
-  def runBellmanFord(graph: WeightedGraph, startNode: Int): Seq[Double] =
+  def runBellmanFord(graph: WeightedGraphAdjacencyList[HalfEdge], startNode: Int): Seq[Double] =
     runBellmanFord(convertGraphRepresentation(graph), startNode)
 
-  private def convertGraphRepresentation(graph: WeightedGraph): WeightedGraphEdges =
+  private def convertGraphRepresentation(graph: WeightedGraphAdjacencyList[HalfEdge]): WeightedGraphEdgeList =
     graph.flatMap {
       case (fromNode, edges) =>
         edges.map(edge => Edge(fromNode, edge.toNode, edge.weight))
