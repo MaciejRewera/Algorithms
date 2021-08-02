@@ -1,38 +1,38 @@
 package com.rewera.graphtheory
 
+import com.rewera.graphtheory.WeightedDirectedGraph.{WeightedDirectedEdge => Edge, WeightedDirectedHalfEdge => HalfEdge}
+
 object BellmanFord {
 
-  private case class Edge(fromNode: Int, toNode: Int, weight: Int)
-  private type WeightedGraphEdgeList = Seq[Edge]
-
-  private case class HalfEdge(toNode: Int, weight: Int)
-  private type WeightedGraphAdjacencyList[T] = Map[Int, Seq[T]]
-
-  private val theGraphEdges: WeightedGraphEdgeList = Seq(
-    Edge(0, 1, 5),
-    Edge(1, 2, 20),
-    Edge(1, 5, 30),
-    Edge(1, 6, 60),
-    Edge(2, 3, 10),
-    Edge(2, 4, 75),
-    Edge(3, 2, -15),
-    Edge(4, 9, 100),
-    Edge(5, 4, 25),
-    Edge(5, 6, 5),
-    Edge(5, 8, 50),
-    Edge(6, 7, -50),
-    Edge(7, 8, -10)
+  private val theGraphEdges: WeightedDirectedGraph[Int, Int] = WeightedDirectedGraph(
+    Seq(
+      Edge(0, 1, 5),
+      Edge(1, 2, 20),
+      Edge(1, 5, 30),
+      Edge(1, 6, 60),
+      Edge(2, 3, 10),
+      Edge(2, 4, 75),
+      Edge(3, 2, -15),
+      Edge(4, 9, 100),
+      Edge(5, 4, 25),
+      Edge(5, 6, 5),
+      Edge(5, 8, 50),
+      Edge(6, 7, -50),
+      Edge(7, 8, -10)
+    )
   )
 
-  private val theGraph: WeightedGraphAdjacencyList[HalfEdge] = Map(
-    0 -> Seq(HalfEdge(1, 5)),
-    1 -> Seq(HalfEdge(2, 20), HalfEdge(5, 30), HalfEdge(6, 60)),
-    2 -> Seq(HalfEdge(3, 10), HalfEdge(4, 75)),
-    3 -> Seq(HalfEdge(2, -15)),
-    4 -> Seq(HalfEdge(9, 100)),
-    5 -> Seq(HalfEdge(4, 25), HalfEdge(6, 5), HalfEdge(8, 50)),
-    6 -> Seq(HalfEdge(7, -50)),
-    7 -> Seq(HalfEdge(8, -10))
+  private val theGraph: WeightedDirectedGraph[Int, Int] = WeightedDirectedGraph(
+    Map(
+      0 -> Seq(HalfEdge(1, 5)),
+      1 -> Seq(HalfEdge(2, 20), HalfEdge(5, 30), HalfEdge(6, 60)),
+      2 -> Seq(HalfEdge(3, 10), HalfEdge(4, 75)),
+      3 -> Seq(HalfEdge(2, -15)),
+      4 -> Seq(HalfEdge(9, 100)),
+      5 -> Seq(HalfEdge(4, 25), HalfEdge(6, 5), HalfEdge(8, 50)),
+      6 -> Seq(HalfEdge(7, -50)),
+      7 -> Seq(HalfEdge(8, -10))
+    )
   )
 
   def main(args: Array[String]): Unit = {
@@ -41,13 +41,13 @@ object BellmanFord {
     println(runBellmanFord(theGraph, 0).mkString("[", ", ", "]"))
   }
 
-  def runBellmanFord(graph: WeightedGraphEdgeList, startNode: Int): Seq[Double] = {
+  def runBellmanFord(graph: WeightedDirectedGraph[Int, Int], startNode: Int): Seq[Double] = {
     val verticesAmount = vertices(graph).size
     val distances = Array.fill(verticesAmount)(Double.PositiveInfinity)
     distances(startNode) = 0
 
     (0 until verticesAmount).foreach { _ =>
-      graph.foreach { edge =>
+      graph.edgeList.foreach { edge =>
         val newDistance = distances(edge.fromNode) + edge.weight
         if (newDistance < distances(edge.toNode))
           distances(edge.toNode) = newDistance
@@ -55,7 +55,7 @@ object BellmanFord {
     }
 
     (0 until verticesAmount).foreach { _ =>
-      graph.foreach { edge =>
+      graph.edgeList.foreach { edge =>
         val newDistance = distances(edge.fromNode) + edge.weight
         if (newDistance < distances(edge.toNode))
           distances(edge.toNode) = Double.NegativeInfinity
@@ -65,15 +65,7 @@ object BellmanFord {
     distances
   }
 
-  private def vertices(graph: WeightedGraphEdgeList): Set[Int] = graph.map(_.fromNode).toSet ++ graph.map(_.toNode).toSet
-
-  def runBellmanFord(graph: WeightedGraphAdjacencyList[HalfEdge], startNode: Int): Seq[Double] =
-    runBellmanFord(convertGraphRepresentation(graph), startNode)
-
-  private def convertGraphRepresentation(graph: WeightedGraphAdjacencyList[HalfEdge]): WeightedGraphEdgeList =
-    graph.flatMap {
-      case (fromNode, edges) =>
-        edges.map(edge => Edge(fromNode, edge.toNode, edge.weight))
-    }.toSeq
+  private def vertices[N, W](graph: WeightedDirectedGraph[N, W]): Set[N] =
+    graph.edgeList.map(_.fromNode).toSet ++ graph.edgeList.map(_.toNode).toSet
 
 }
