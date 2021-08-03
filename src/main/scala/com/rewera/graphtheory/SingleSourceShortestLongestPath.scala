@@ -36,6 +36,7 @@ object SingleSourceShortestLongestPath {
     topologicalOrder.foreach { currNode =>
       if (distances(currNode).nonEmpty) {
         val adjacentEdges = graph(currNode)
+
         for (edge <- adjacentEdges) {
 
           val newDist = distances(currNode).map(_ + edge.weight)

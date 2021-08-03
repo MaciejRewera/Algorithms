@@ -10,6 +10,8 @@ case class WeightedDirectedGraph[N, W](adjacencyList: AdjacencyList[N, W]) {
         edges.map(edge => WeightedDirectedEdge(fromNode, edge.toNode, edge.weight))
     }.toList
 
+
+
 }
 
 object WeightedDirectedGraph {
